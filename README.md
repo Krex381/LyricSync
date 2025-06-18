@@ -43,8 +43,7 @@ A powerful Node.js application that automatically fetches and displays synchroni
 
 - **Node.js** (v14.0.0 or higher)
 - **Discord Account** with user token
-- **Spotify** account connected to Discord via Lanyard
-- **Lanyard** bot added to your Discord server
+- **Lanyard** Joined to the Discord server
 
 ### Step 1: Clone the Repository
 
