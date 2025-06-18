@@ -1,0 +1,20 @@
+{
+  "name": "auto-lyrics-discord",
+  "version": "1.0.0",
+  "description": "Get in realtime Music Lyrics for the Song listened on Spotify",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Spotify",
+    "Lyrics"
+  ],
+  "author": "Krex",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.7.0",
+    "ws": "^8.14.2"
+  }
+}
