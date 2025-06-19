@@ -133,7 +133,7 @@ The application automatically:
 ### Rate Limiting & Performance
 
 ```javascript
-const STATUS_UPDATE_COOLDOWN = 450;
+const STATUS_UPDATE_COOLDOWN = 1000 // 1 second timeout;
 ```
 
 - **Smart Queuing**: Updates are queued when rate limited
