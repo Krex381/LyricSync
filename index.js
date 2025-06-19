@@ -96,7 +96,7 @@ function log(level, message, data = null) {
 
 // Rate limiting for Discord API
 let lastStatusUpdate = 0;
-const STATUS_UPDATE_COOLDOWN = 450;
+const STATUS_UPDATE_COOLDOWN = 1000; // Increased from 450ms to 1000ms
 let statusQueue = null;
 
 async function updateDiscordStatus(status) {
@@ -127,7 +127,6 @@ async function updateDiscordStatus(status) {
             }
         };
         
-        log('info', `Attempting to update Discord status: ${limitedStatus.substring(0, 30)}...`);
         
         const response = await fetch('https://discord.com/api/v9/users/@me/settings', {
             method: 'PATCH',
@@ -139,15 +138,6 @@ async function updateDiscordStatus(status) {
         });
         
         if (response.ok) {
-            log('success', `Discord status updated: ${limitedStatus.substring(0, 50)}...`);
-
-            if (statusQueue) {
-                setTimeout(() => {
-                    const queuedStatus = statusQueue;
-                    statusQueue = null;
-                    updateDiscordStatus(queuedStatus);
-                }, STATUS_UPDATE_COOLDOWN);
-            }
         } else {
             const errorText = await response.text();
             log('error', `Failed to update Discord status: ${response.status} ${response.statusText}`);
@@ -161,6 +151,15 @@ async function updateDiscordStatus(status) {
         
     } catch (error) {        
         log('error', `Discord status update error: ${error.message}`);
+    }
+    
+    // Process queued status after a delay
+    if (statusQueue) {
+        setTimeout(() => {
+            const queuedStatus = statusQueue;
+            statusQueue = null;
+            updateDiscordStatus(queuedStatus);
+        }, STATUS_UPDATE_COOLDOWN);
     }
 }
 
@@ -480,7 +479,6 @@ async function fetchAndDisplayLyrics(spotify) {
                     console.log(`${colors.cyan}${currentLyrics[0].text}${colors.reset}`);
                 } else {
                     const enhancedCount = currentLyrics.filter(l => l.enhanced).length;
-                    log('success', `Found ${currentLyrics.length} lyrics lines (${enhancedCount} enhanced)`);
                     startLyricsDisplay(spotify);
                 }
             } else {
@@ -570,9 +568,26 @@ ${colors.green}♪ [${timestamp}]${colors.reset} ${displayText}${colors.dim}${co
     
     console.log(lyricsDisplay);
 
+    // Improved conditions for Discord status updates
     const cleanText = lyricsLine.text.replace(/\x1b\[[0-9;]*m/g, '').trim();
-    if (cleanText.length > 5 && cleanText.length < 80 && !cleanText.includes('[') && !cleanText.includes('(')) {
-        updateDiscordStatus(`${cleanText}`);
+    // Remove extra filtering - update status for most lyrics
+    if (cleanText.length > 3 && cleanText.length < 100) {
+        // Add emoji to make it clear it's lyrics
+        updateDiscordStatus(`🎤 ${cleanText}`);
+    }
+}
+
+function displayLyricsLine(text, elapsedMs) {
+    const timestamp = formatTime(Math.floor(elapsedMs / 1000));
+    
+    const lyricsDisplay = `
+${colors.yellow}♪ [${timestamp}] ${colors.cyan}${text}${colors.reset}`;
+    
+    console.log(lyricsDisplay);
+
+    // Improved conditions for Discord status updates
+    if (text.length > 3 && text.length < 100) {
+        updateDiscordStatus(`🎤 ${text}`);
     }
 }
 
